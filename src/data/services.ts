@@ -4,6 +4,9 @@ export interface Service {
   title: string;
   description: string;
   cta: string;
+  price?: string;
+  duration?: string;
+  badge?: string;
 }
 
 export const services: Service[] = [
@@ -12,23 +15,30 @@ export const services: Service[] = [
     icon: '🎨',
     title: 'UX-UI Design',
     description:
-      'Nous créons des interfaces élégantes, simples à utiliser et visuellement cohérentes grâce à une méthode rigoureuse alliant wireframes, maquettes interactives et branding mobile.',
-    cta: 'En savoir plus',
+      'Interfaces élégantes, simples à utiliser et visuellement cohérentes. Wireframes, maquettes haute fidélité sur Figma, design system et prototype interactif — livrés prêts à développer.',
+    cta: 'Démarrer mon design',
+    price: 'À partir de 80 000 FCFA',
+    duration: 'Livraison en 2–3 semaines',
   },
   {
     id: 'mobile-dev',
     icon: '📱',
     title: 'Développement mobile',
     description:
-      'Nous développons des applications performantes, rapides et évolutives pour Android et iOS, en utilisant une seule base de code. Grâce à une architecture propre et optimisée, chaque app est pensée pour durer et s\'adapter facilement aux futurs besoins.',
-    cta: 'En savoir plus',
+      "Applications performantes pour Android & iOS en Flutter ou React Native selon votre contexte. Architecture propre, code testé et documenté. Back-office web inclus si le projet le nécessite.",
+    cta: 'Lancer mon application',
+    price: 'À partir de 150 000 FCFA',
+    duration: 'Livraison en 4–8 semaines',
+    badge: '⭐ Le plus demandé',
   },
   {
     id: 'coaching',
     icon: '🎓',
-    title: 'Accompagnements & Formations',
+    title: 'Coaching & Formations',
     description:
-      'Coaching personnalisé, ateliers pratiques et formations sur-mesure pour maîtriser le développement mobile, Flutter ou l\'UX/UI, que vous soyez débutant ou confirmé.',
-    cta: 'Découvrir',
+      "Coaching personnalisé, ateliers pratiques et formations sur-mesure pour maîtriser Flutter, React Native ou l'UX/UI — pour débutants comme pour confirmés.",
+    cta: 'Commencer ma formation',
+    price: 'Sur devis personnalisé',
+    duration: 'Dès 1 session / semaine',
   },
 ];

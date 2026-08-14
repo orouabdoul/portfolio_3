@@ -36,25 +36,32 @@ type Filter = "all" | ProjectCategory;
 
 // ── Constants ──────────────────────────────────────────────────────────────────
 const HERO_ROLES = [
-  { text: "Développeur mobile", color: "#0FEDD3" },
+  { text: "Expert Flutter", color: "#0FEDD3" },
+  { text: "Expert React Native", color: "#61DAFB" },
   { text: "Designer UI/UX", color: "#FFFFFF" },
+  { text: "Full-Stack Mobile", color: "#0ea5e9" },
 ];
 
 const WHY_ITEMS = [
   {
     icon: "⚡",
-    title: "Réactivité & pédagogie",
-    desc: "Un accompagnement clair, des réponses rapides et une vraie écoute pour chaque projet.",
+    title: "Réponse garantie sous 24h",
+    desc: "Toujours joignable, toujours réactif. Chaque message reçoit une réponse rapide et claire.",
   },
   {
     icon: "🏆",
-    title: "Qualité premium",
-    desc: "Des apps robustes, design et performantes, pensées pour durer et évoluer.",
+    title: "Code livré testé & documenté",
+    desc: "Des apps robustes, lisibles et maintenables — prêtes à évoluer bien au-delà de la livraison.",
   },
   {
     icon: "😊",
-    title: "Satisfaction garantie",
-    desc: "Des clients heureux, des retours positifs et un suivi même après la livraison.",
+    title: "3 clients sur 3 ont recommencé",
+    desc: "La satisfaction ne s'arrête pas à la livraison. Un suivi post-lancement est toujours proposé.",
+  },
+  {
+    icon: "🤖",
+    title: "IA intégrée · 2× plus rapide",
+    desc: "Grâce aux outils IA, je livre plus vite sans sacrifier la qualité. Vous gagnez du temps et de l'argent.",
   },
 ];
 
@@ -104,9 +111,13 @@ const PROCESS_STEPS = [
 ];
 
 const STATS = [
-  { value: `${profile.yearsExperience}+`, label: "ans d'expérience" },
-  { value: `${profile.projectCount}+`, label: "apps livrées" },
-  { value: `${profile.clientCount}+`, label: "clients satisfaits" },
+  {
+    value: `${profile.yearsExperience}+`,
+    label: "ans de maîtrise Flutter & UX",
+  },
+  { value: `${profile.projectCount}+`, label: "apps livrées sur 2 continents" },
+  { value: "100%", label: "clients satisfaits" },
+  { value: "<24h", label: "délai de réponse moyen" },
 ];
 
 const FILTERS: { key: Filter; label: string }[] = [
@@ -131,6 +142,15 @@ const CAT_GRAD: Record<string, string> = {
   mobile: "linear-gradient(135deg,#0FEDD3,#0D91ED)",
   design: "linear-gradient(135deg,#7C3AED,#F472B6)",
   web: "linear-gradient(135deg,#F472B6,#FB923C)",
+};
+
+const SOCIAL_COLORS: Record<string, string> = {
+  Email: "#0ea5e9",
+  WhatsApp: "#25D366",
+  LinkedIn: "#0077B5",
+  GitHub: "#24292e",
+  Facebook: "#1877F2",
+  Telegram: "#2AABEE",
 };
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
@@ -538,6 +558,7 @@ function TestimonialsCarousel() {
               </View>
             )}
           </View>
+          {t.rating && <Text style={tsSt.stars}>{"★".repeat(t.rating)}</Text>}
           <Text style={tsSt.quote}>"{t.quote}"</Text>
           <Text style={tsSt.name}>{t.name}</Text>
           <Text style={tsSt.role}>{t.role}</Text>
@@ -747,20 +768,28 @@ export default function HomeScreen() {
               <HeroTypewriter width={width} />
 
               <Text style={heroSt.heroPara}>
-                {
-                  "J'accompagne les startups et entrepreneurs à transformer leurs idées en applications "
-                }
-                <Text style={heroSt.accent}>rapides</Text>
-                {", "}
-                <Text style={heroSt.accent}>élégantes</Text>
+                {"Je développe en "}
+                <Text style={heroSt.accent}>Flutter</Text>
                 {" et "}
-                <Text style={heroSt.accent}>centrées utilisateur</Text>
-                {".\n"}
+                <Text style={heroSt.accent}>React Native</Text>
+                {
+                  " — apps iOS & Android performantes, élégantes et prêtes à scaler. Besoin d'un "
+                }
+                <Text style={heroSt.accent}>back-office web</Text>
+                {" ? Je m'en charge aussi.\n"}
                 <Text style={heroSt.secretLabel}>Mon secret ? </Text>
                 {
-                  "Un mix unique de design émotionnel, de code robuste et d'écoute attentive pour créer des expériences qui marquent et font grandir votre business."
+                  "Un mix de design émotionnel, de code robuste et d'écoute attentive pour créer des expériences qui marquent et font grandir votre business."
                 }
               </Text>
+
+              {/* Badge disponibilité */}
+              <View style={heroSt.availBadge}>
+                <View style={heroSt.availDot} />
+                <Text style={heroSt.availText}>
+                  Disponible pour nouveaux projets
+                </Text>
+              </View>
 
               <View style={heroSt.ctaRow}>
                 <Pressable
@@ -781,21 +810,16 @@ export default function HomeScreen() {
                   ]}
                   onPress={() => {
                     if (Platform.OS === "web") {
-                      // Créer un lien <a> avec download pour forcer le téléchargement
-                      const a = document.createElement("a");
-                      a.href = profile.cvUrl;
-                      a.download = "CV-Abdoulaye-Issiaka.pdf";
-                      document.body.appendChild(a);
-                      a.click();
-                      document.body.removeChild(a);
+                      const el = document.getElementById("projects");
+                      if (el) el.scrollIntoView({ behavior: "smooth" });
                     } else {
-                      Linking.openURL(
-                        "mailto:orouabdoulayeissiaka@gmail.com?subject=Demande de CV",
-                      );
+                      router.push("/projects");
                     }
                   }}
                 >
-                  <Text style={heroSt.ctaOutlineText}>Télécharger mon CV</Text>
+                  <Text style={heroSt.ctaOutlineText}>
+                    Voir mes réalisations
+                  </Text>
                 </Pressable>
               </View>
             </View>
@@ -851,12 +875,13 @@ export default function HomeScreen() {
               </Text>
               <Text style={aboutSt.bioPara}>
                 {
-                  "Artisan du mobile, passionné par l'alliance entre technologie fonctionnelle et design intuitif. J'accompagne les startups et solopreneurs à transformer leurs idées en "
+                  "Expert Flutter & React Native, passionné par l'alliance entre technologie fonctionnelle et design intuitif. J'accompagne les startups et solopreneurs à transformer leurs idées en "
                 }
                 <Text style={aboutSt.bioCyan}>
                   applications mobiles concrètes, élégantes et prêtes à
-                  conquérir le marché.
+                  conquérir le marché
                 </Text>
+                {" — avec back-office web intégré si le projet le demande."}
               </Text>
               <View style={aboutSt.missionBox}>
                 <Text style={aboutSt.missionLabel}>Ma mission</Text>
@@ -866,6 +891,11 @@ export default function HomeScreen() {
                     Développement Flutter & React Native
                   </Text>
                   {" — apps performantes, scalables et multiplateformes.\n"}
+                  {"🖥️ "}
+                  <Text style={aboutSt.bioCyan}>Back-office web</Text>
+                  {
+                    " — inclus si le projet le nécessite, sans changer de prestataire.\n"
+                  }
                   {"🎨 "}
                   <Text style={aboutSt.bioCyan}>Design UX/UI</Text>
                   {" — expériences fluides, esthétiques et efficaces."}
@@ -1046,7 +1076,11 @@ export default function HomeScreen() {
                   key={w.title}
                   // @ts-ignore
                   className="why-card-rn"
-                  style={[heroSt.whyCard, isMedium && heroSt.whyCardMedium]}
+                  style={[
+                    heroSt.whyCard,
+                    isMedium && heroSt.whyCardMedium,
+                    isDesktop && heroSt.whyCardDesktop,
+                  ]}
                 >
                   <View style={heroSt.whyIconWrap}>
                     <Text style={heroSt.whyIconEmoji}>{w.icon}</Text>
@@ -1078,11 +1112,20 @@ export default function HomeScreen() {
                   className="svc-card-rn"
                   style={[heroSt.svcCard, isMedium && heroSt.svcCardMedium]}
                 >
+                  {s.badge && (
+                    <View style={heroSt.svcBadge}>
+                      <Text style={heroSt.svcBadgeText}>{s.badge}</Text>
+                    </View>
+                  )}
                   <View style={heroSt.svcIconWrap}>
                     <Text style={heroSt.svcIconEmoji}>{s.icon}</Text>
                   </View>
                   <Text style={heroSt.svcCardTitle}>{s.title}</Text>
                   <Text style={heroSt.svcCardDesc}>{s.description}</Text>
+                  {s.price && <Text style={heroSt.svcPrice}>{s.price}</Text>}
+                  {s.duration && (
+                    <Text style={heroSt.svcDuration}>⏱ {s.duration}</Text>
+                  )}
                   <Pressable
                     style={({ pressed }) => [
                       heroSt.svcBtn,
@@ -1213,7 +1256,7 @@ export default function HomeScreen() {
         {/* ════════════════════════════════════════════════════════════
             9. PROJETS
         ════════════════════════════════════════════════════════════ */}
-        <View style={projSt.outer}>
+        <View style={projSt.outer} nativeID="projects">
           <View style={projSt.inner}>
             <View style={projSt.titleWrap}>
               <Text style={projSt.sectionTitle}>
@@ -1296,6 +1339,14 @@ export default function HomeScreen() {
         <View style={contactSt.outer}>
           <View style={contactSt.inner}>
             <Text style={contactSt.sectionTitle}>Contact</Text>
+            <View style={contactSt.responseInfo}>
+              <Text style={contactSt.responseItem}>
+                ⏱ Réponse sous 4h en moyenne
+              </Text>
+              <Text style={contactSt.responseItem}>
+                📅 Premier échange offert — 30 min
+              </Text>
+            </View>
             <View style={contactSt.formCard}>
               <View style={contactSt.fieldWrap}>
                 <Text style={contactSt.label}>Nom</Text>
@@ -1335,7 +1386,7 @@ export default function HomeScreen() {
                   // @ts-ignore
                   className="contact-input-rn"
                   style={[...inputFor("message"), contactSt.textarea]}
-                  placeholder="Votre message"
+                  placeholder="Décrivez votre idée ou projet — même floue, on s'en occupe ensemble !"
                   placeholderTextColor="rgba(255,255,255,0.3)"
                   multiline
                   numberOfLines={5}
@@ -1366,23 +1417,32 @@ export default function HomeScreen() {
         <View style={contactSt.socialsOuter}>
           <View style={contactSt.socialsInner}>
             <Text style={contactSt.socialsTitle}>Retrouvez-moi sur</Text>
-            <View style={contactSt.socialsGrid}>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={contactSt.socialsRow}
+            >
               {profile.socials.map((s) => (
                 <Pressable
                   key={s.label}
                   onPress={() => openLink(s.href)}
-                  // @ts-ignore
-                  className="social-btn-rn"
                   style={({ pressed }) => [
-                    contactSt.socialBtn,
-                    pressed && { opacity: 0.75 },
+                    contactSt.socialItem,
+                    pressed && { opacity: 0.7 },
                   ]}
                 >
-                  <Text style={contactSt.socialIcon}>{s.icon}</Text>
-                  <Text style={contactSt.socialLabel}>{s.label}</Text>
+                  <View
+                    style={[
+                      contactSt.socialCircle,
+                      { backgroundColor: SOCIAL_COLORS[s.label] ?? "#0ea5e9" },
+                    ]}
+                  >
+                    <Text style={contactSt.socialCircleIcon}>{s.icon}</Text>
+                  </View>
+                  <Text style={contactSt.socialCircleLabel}>{s.label}</Text>
                 </Pressable>
               ))}
-            </View>
+            </ScrollView>
           </View>
         </View>
       </ScrollView>
@@ -1499,6 +1559,30 @@ const heroSt = StyleSheet.create({
     fontSize: 13,
     textAlign: "center",
   },
+  availBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    alignSelf: "flex-start",
+    backgroundColor: "rgba(15,237,211,0.1)",
+    borderWidth: 1,
+    borderColor: "rgba(15,237,211,0.3)",
+    borderRadius: 20,
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+    marginBottom: 4,
+  },
+  availDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: "#0FEDD3",
+  },
+  availText: {
+    color: "#0FEDD3",
+    fontSize: 13,
+    fontWeight: "600",
+  },
   decorCircle: {
     position: "absolute",
     right: -120,
@@ -1546,21 +1630,25 @@ const heroSt = StyleSheet.create({
     marginBottom: Spacing.five,
   },
   whyCardsRow: { flexDirection: "column", gap: Spacing.three, width: "100%" },
-  whyCardsRowMedium: { flexDirection: "row", alignItems: "stretch" },
+  whyCardsRowMedium: {
+    flexDirection: "row",
+    alignItems: "stretch",
+    flexWrap: "wrap",
+  },
   whyCard: {
     backgroundColor: "#212529",
     borderRadius: 16,
     padding: 24,
     alignItems: "center",
     gap: Spacing.two,
-    flex: 1,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.3,
     shadowRadius: 20,
     elevation: 8,
   },
-  whyCardMedium: { flex: 1 },
+  whyCardMedium: { flex: 0, width: "47%" },
+  whyCardDesktop: { flex: 1, width: undefined },
   whyIconWrap: {
     width: 64,
     height: 64,
@@ -1641,6 +1729,29 @@ const heroSt = StyleSheet.create({
     textAlign: "center",
     lineHeight: 22,
     flex: 1,
+  },
+  svcBadge: {
+    backgroundColor: "rgba(14,165,233,0.15)",
+    borderWidth: 1,
+    borderColor: "rgba(14,165,233,0.4)",
+    borderRadius: 20,
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    alignSelf: "center",
+    marginBottom: 4,
+  },
+  svcBadgeText: { color: "#0ea5e9", fontSize: 12, fontWeight: "700" },
+  svcPrice: {
+    color: "#0FEDD3",
+    fontWeight: "700",
+    fontSize: 15,
+    textAlign: "center",
+    marginTop: 4,
+  },
+  svcDuration: {
+    color: "rgba(255,255,255,0.55)",
+    fontSize: 13,
+    textAlign: "center",
   },
   svcBtn: {
     marginTop: Spacing.two,
@@ -2270,6 +2381,23 @@ const contactSt = StyleSheet.create({
   },
   inputFocused: { borderColor: "#0ea5e9" },
   textarea: { height: 130, paddingTop: 12 },
+  responseInfo: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: Spacing.two,
+    marginBottom: Spacing.four,
+    justifyContent: "center",
+  },
+  responseItem: {
+    color: "rgba(255,255,255,0.65)",
+    fontSize: 14,
+    backgroundColor: "rgba(255,255,255,0.05)",
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.1)",
+  },
   submitBtn: {
     backgroundColor: "#0ea5e9",
     paddingVertical: 13,
@@ -2300,25 +2428,41 @@ const contactSt = StyleSheet.create({
     marginBottom: Spacing.four,
     textAlign: "center",
   },
-  socialsGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: Spacing.two,
-    justifyContent: "center",
-  },
-  socialBtn: {
-    backgroundColor: "#212529",
-    borderWidth: 1,
-    borderColor: "rgba(14,165,233,0.3)",
-    borderRadius: 12,
-    paddingVertical: 10,
-    paddingHorizontal: 18,
+  socialsRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 8,
+    gap: Spacing.four,
+    paddingHorizontal: Spacing.two,
+    paddingVertical: Spacing.two,
   },
-  socialIcon: { fontSize: 18 },
-  socialLabel: { color: "#FFFFFF", fontWeight: "600", fontSize: 14 },
+  socialItem: {
+    alignItems: "center",
+    gap: Spacing.one,
+  },
+  socialCircle: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 6,
+    elevation: 4,
+  },
+  socialCircleIcon: {
+    fontSize: 26,
+    color: "#FFFFFF",
+    fontWeight: "700",
+    lineHeight: 30,
+  },
+  socialCircleLabel: {
+    color: "#CBD5E1",
+    fontSize: 12,
+    fontWeight: "600",
+    textAlign: "center",
+  },
 });
 
 // ── Contact feedback dialog ───────────────────────────────────────────────────
@@ -2524,6 +2668,12 @@ const tsSt = StyleSheet.create({
     fontSize: 13,
     color: "rgba(255,255,255,0.72)",
     textAlign: "center",
+  },
+  stars: {
+    color: "#FACC15",
+    fontSize: 22,
+    letterSpacing: 2,
+    marginBottom: Spacing.two,
   },
   dots: { flexDirection: "row", gap: 8, marginTop: Spacing.four },
   dot: {

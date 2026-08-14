@@ -4,27 +4,32 @@ export interface Testimonial {
   role: string;
   quote: string;
   imageUrl?: string;
+  rating?: number;
 }
 
 export const testimonials: Testimonial[] = [
   {
     id: 't1',
     name: 'Omar Faruk',
-    role: 'Paid Ads · GA4 · CRO',
+    role: 'Consultant Marketing · Paid Ads & CRO',
     quote:
-      "Amadou a apporté professionnalisme, précision et rapidité, offrant une collaboration fluide et un résultat frontend/UX qui a propulsé notre projet.",
+      "En 6 semaines, Amadou a livré un frontend fluide et une UX irréprochable. Professionnalisme, précision et réactivité — notre projet a décollé dès le lancement.",
+    rating: 5,
   },
   {
     id: 't2',
     name: 'Julien M.',
     role: 'Solopreneur · SaaS',
-    quote: "Pédagogie, expertise et disponibilité. Je recommande à 100 % pour tout projet mobile !",
+    quote:
+      "Pédagogie, expertise et disponibilité hors pair. Mon app SaaS livrée dans les délais, avec un code propre et prêt à scaler. Je recommande à 100 % sans hésitation !",
+    rating: 5,
   },
   {
     id: 't3',
     name: 'Fatou D.',
-    role: 'Responsable Produit',
+    role: 'Responsable Produit · Startup Tech',
     quote:
-      "Un vrai partenaire, force de proposition et toujours à l'écoute. Résultat : une appli qui cartonne !",
+      "Un vrai partenaire stratégique, force de proposition et toujours à l'écoute. Notre appli a été adoptée immédiatement par nos utilisateurs dès le premier jour de lancement.",
+    rating: 5,
   },
 ];
