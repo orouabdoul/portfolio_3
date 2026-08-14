@@ -30,17 +30,4 @@ export const educationEntries: TimelineEntry[] = [
     period: '2021 – 2024',
     description: 'Formation professionnelle & développement mobile.',
   },
-  {
-    id: 'e4',
-    title: 'Baccalauréat',
-    institution: 'CEG Gomparou',
-    period: '2017 – 2021',
-    description: 'Série scientifique.',
-  },
-  {
-    id: 'e5',
-    title: 'Certificat d\'Études du Premier Cycle',
-    institution: 'CEG Kokey',
-    period: '2013 – 2017',
-  },
 ];

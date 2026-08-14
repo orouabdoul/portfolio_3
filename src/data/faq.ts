@@ -55,8 +55,14 @@ export const faqEntries: FaqEntry[] = [
   },
   {
     id: 'f8',
-    question: "Êtes-vous disponible pour un nouveau projet ?",
+    question: "Proposez-vous un contrat de confidentialité (NDA) ?",
     answer:
-      "Oui, j'accepte actuellement de nouveaux projets. Mon agenda étant limité à quelques clients simultanément pour garantir la qualité, je vous recommande de me contacter rapidement pour réserver votre place. Réponse garantie sous 24h.",
+      "Oui, systématiquement. Un NDA peut être signé avant tout échange sur votre projet. Vos idées, données, code source et informations restent strictement confidentiels. La confiance est la base de chaque collaboration.",
+  },
+  {
+    id: 'f9',
+    question: "Travaillez-vous avec des équipes déjà en place ?",
+    answer:
+      "Tout à fait. Je m'intègre facilement à une équipe existante — développeurs, PO, designer ou CTO. Je m'adapte à vos outils (Slack, Notion, Jira, GitHub…) et à votre workflow. L'objectif reste le même : livrer vite et bien.",
   },
 ];
