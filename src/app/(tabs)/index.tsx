@@ -156,13 +156,19 @@ const CLIENTS = [
     name: "COSIT-BENIN",
     abbr: "CB",
     color: "#0ea5e9",
-    sub: "Organisation nationale · Bénin",
+    sector: "Organisation nationale · Bénin",
+    projects: ["SIM", "MyMonto Garages", "MyMonto Users"],
+    result: "3 applications livrées en production",
+    scope: "Développeur Mobile Full-Stack",
   },
   {
     name: "Smart Bulk Editor",
     abbr: "SBE",
     color: "#7C3AED",
-    sub: "E-commerce SaaS",
+    sector: "E-commerce SaaS",
+    projects: ["UI/UX Design", "Design System", "Prototype Figma"],
+    result: "Prototype validé · 0 aller-retour développement",
+    scope: "UI/UX Designer",
   },
 ];
 
@@ -308,15 +314,25 @@ function ProjCard({
         className="proj-card-rn"
         style={projCardSt.card}
       >
-        <View style={[projCardSt.imgArea, gradBg]}>
-          <View
-            // @ts-ignore
-            className="proj-grad-overlay-rn"
-            style={projCardSt.gradOverlay}
-          />
-          <Text style={projCardSt.initials}>
-            {projectInitials(project.title)}
-          </Text>
+        <View style={[projCardSt.imgArea, project.imageUrl ? {} : gradBg]}>
+          {project.imageUrl ? (
+            <Image
+              source={{ uri: project.imageUrl }}
+              style={StyleSheet.absoluteFill}
+              resizeMode="cover"
+            />
+          ) : (
+            <>
+              <View
+                // @ts-ignore
+                className="proj-grad-overlay-rn"
+                style={projCardSt.gradOverlay}
+              />
+              <Text style={projCardSt.initials}>
+                {projectInitials(project.title)}
+              </Text>
+            </>
+          )}
           <View
             style={[
               projCardSt.catBadge,
@@ -327,6 +343,11 @@ function ProjCard({
               {(CAT_LABEL[project.category] ?? project.category).toUpperCase()}
             </Text>
           </View>
+          {project.featured && (
+            <View style={projCardSt.featuredBadge}>
+              <Text style={projCardSt.featuredText}>⭐ Featured</Text>
+            </View>
+          )}
           {project.duration && (
             <View style={projCardSt.durationBadge}>
               <Text style={projCardSt.durationText}>{project.duration}</Text>
@@ -366,21 +387,26 @@ function ProjCard({
               </View>
             )}
           </View>
+          <View style={projCardSt.ctaRow}>
+            <Text style={projCardSt.ctaText}>Voir le projet →</Text>
+          </View>
         </View>
       </View>
     </Pressable>
   );
 }
 
-// ── ProjModal ──────────────────────────────────────────────────────────────────
-function ProjModal({
+// ── ProjDetail — full-screen project page ─────────────────────────────────────
+function ProjDetail({
   project,
   onClose,
 }: {
   project: Project;
   onClose: () => void;
 }) {
+  const insets = useSafeAreaInsets();
   const accent = CAT_COLOR[project.category] ?? "#6366f1";
+  const accentSafe = accent === "#0FEDD3" ? "#0ea5e9" : accent;
   const gradBg =
     Platform.OS === "web"
       ? ({
@@ -390,93 +416,312 @@ function ProjModal({
         } as any)
       : { backgroundColor: accent };
 
-  return (
-    <Modal visible transparent animationType="fade" onRequestClose={onClose}>
-      <View style={projModalSt.overlay}>
-        <Pressable style={StyleSheet.absoluteFill} onPress={onClose} />
-        <View style={projModalSt.dialog}>
-          <View style={projModalSt.header}>
-            <View style={{ flex: 1 }}>
-              <View
-                style={[
-                  projModalSt.catBadge,
-                  {
-                    backgroundColor: accent === "#0FEDD3" ? "#0ea5e9" : accent,
-                  },
-                ]}
-              >
-                <Text style={projModalSt.catBadgeText}>
-                  {(
-                    CAT_LABEL[project.category] ?? project.category
-                  ).toUpperCase()}
-                </Text>
-              </View>
-              <Text style={projModalSt.title}>{project.title}</Text>
-            </View>
-            <Pressable onPress={onClose} style={projModalSt.closeBtn}>
-              <Text style={projModalSt.closeBtnText}>✕</Text>
-            </Pressable>
-          </View>
+  const hasLinks =
+    project.demo ||
+    project.github ||
+    project.playStoreUrl ||
+    project.appStoreUrl ||
+    project.figmaUrl;
 
-          <ScrollView
-            style={projModalSt.body}
-            showsVerticalScrollIndicator={false}
+  return (
+    <Modal visible animationType="slide" onRequestClose={onClose}>
+      <View style={[projDetailSt.root, { paddingTop: insets.top }]}>
+        {/* ── Sticky header ── */}
+        <View style={projDetailSt.header}>
+          <Pressable
+            onPress={onClose}
+            style={({ pressed }) => [
+              projDetailSt.backBtn,
+              pressed && { opacity: 0.7 },
+            ]}
           >
-            <View style={[projModalSt.imgPlaceholder, gradBg]}>
-              <Text style={projModalSt.imgInitials}>
-                {projectInitials(project.title)}
+            <Text style={projDetailSt.backArrow}>←</Text>
+            <Text style={projDetailSt.backLabel}>Retour</Text>
+          </Pressable>
+          <View style={[projDetailSt.catPill, { backgroundColor: accentSafe }]}>
+            <Text style={projDetailSt.catPillText}>
+              {(CAT_LABEL[project.category] ?? project.category).toUpperCase()}
+            </Text>
+          </View>
+        </View>
+
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: insets.bottom + 40 }}
+        >
+          {/* ── Hero ── */}
+          <View style={[projDetailSt.hero, project.imageUrl ? {} : gradBg]}>
+            {project.imageUrl && (
+              <Image
+                source={{ uri: project.imageUrl }}
+                style={StyleSheet.absoluteFill}
+                resizeMode="cover"
+              />
+            )}
+            <View style={projDetailSt.heroScrim} />
+            <View style={projDetailSt.heroContent}>
+              {project.featured && (
+                <View style={projDetailSt.featuredPill}>
+                  <Text style={projDetailSt.featuredPillText}>
+                    ⭐ Projet phare
+                  </Text>
+                </View>
+              )}
+              <Text style={projDetailSt.heroTitle}>{project.title}</Text>
+              <Text style={projDetailSt.heroSub} numberOfLines={2}>
+                {project.shortDescription}
               </Text>
             </View>
-            <Text style={projModalSt.desc}>{project.fullDescription}</Text>
-            {project.stack.length > 0 && (
-              <View style={projModalSt.techWrap}>
-                {/* @ts-ignore */}
-                <Text
-                  className="text-gradient-rn"
-                  style={[projModalSt.techLabel, { color: "#6366f1" }]}
-                >
-                  Technologies :
+          </View>
+
+          {/* ── Quick stats ── */}
+          <View style={projDetailSt.statsRow}>
+            {project.year && (
+              <View style={projDetailSt.statPill}>
+                <Text style={projDetailSt.statIcon}>📅</Text>
+                <Text style={projDetailSt.statText}>{project.year}</Text>
+              </View>
+            )}
+            {project.duration && (
+              <View style={projDetailSt.statPill}>
+                <Text style={projDetailSt.statIcon}>⏱</Text>
+                <Text style={projDetailSt.statText}>{project.duration}</Text>
+              </View>
+            )}
+            {project.role && (
+              <View style={[projDetailSt.statPill, { flex: 1 }]}>
+                <Text style={projDetailSt.statIcon}>👤</Text>
+                <Text style={projDetailSt.statText} numberOfLines={1}>
+                  {project.role}
                 </Text>
-                <View style={projModalSt.chips}>
-                  {project.stack.map((t) => (
-                    <View key={t} style={projModalSt.chip}>
-                      <Text style={projModalSt.chipText}>{t}</Text>
-                    </View>
-                  ))}
+              </View>
+            )}
+            {project.client && (
+              <View style={projDetailSt.statPill}>
+                <Text style={projDetailSt.statIcon}>🏢</Text>
+                <Text style={projDetailSt.statText}>{project.client}</Text>
+              </View>
+            )}
+          </View>
+
+          {/* ── Video preview ── */}
+          {project.videoUrl && (
+            <Pressable
+              style={({ pressed }) => [
+                projDetailSt.videoCard,
+                pressed && { opacity: 0.88 },
+              ]}
+              onPress={() => openLink(project.videoUrl!)}
+            >
+              {project.videoPoster ? (
+                <Image
+                  source={{ uri: project.videoPoster }}
+                  style={StyleSheet.absoluteFill}
+                  resizeMode="cover"
+                />
+              ) : (
+                <View style={[StyleSheet.absoluteFill, gradBg]} />
+              )}
+              <View style={projDetailSt.videoScrim} />
+              <View style={projDetailSt.videoPlayBtn}>
+                <Text style={projDetailSt.videoPlayIcon}>▶</Text>
+              </View>
+              <View style={projDetailSt.videoLabel}>
+                <Text style={projDetailSt.videoLabelIcon}>🎬</Text>
+                <Text style={projDetailSt.videoLabelText}>
+                  Voir la vidéo de présentation
+                </Text>
+              </View>
+            </Pressable>
+          )}
+
+          <View style={projDetailSt.body}>
+            {/* ── Challenge ── */}
+            {project.challenge && (
+              <View style={projDetailSt.section}>
+                <Text style={projDetailSt.sectionTitle}>
+                  🎯 Problème résolu
+                </Text>
+                <View style={projDetailSt.challengeBox}>
+                  <Text style={projDetailSt.challengeText}>
+                    {project.challenge}
+                  </Text>
                 </View>
               </View>
             )}
-            {(project.demo || project.github) && (
-              <View style={projModalSt.links}>
-                {project.demo && (
-                  <Pressable
-                    style={({ pressed }) => [
-                      projModalSt.linkBtnGrad,
-                      pressed && { opacity: 0.85 },
-                    ]}
-                    onPress={() => openLink(project.demo!)}
-                  >
-                    <Text style={projModalSt.linkBtnText}>
-                      🔗 {project.category === "design" ? "Prototype" : "Démo"}
-                    </Text>
-                  </Pressable>
-                )}
-                {project.github && (
-                  <Pressable
-                    style={({ pressed }) => [
-                      projModalSt.linkBtnDark,
-                      pressed && { opacity: 0.85 },
-                    ]}
-                    onPress={() => openLink(project.github!)}
-                  >
-                    <Text style={projModalSt.linkBtnText}>GitHub</Text>
-                  </Pressable>
-                )}
+
+            {/* ── Impact ── */}
+            {project.highlights && project.highlights.length > 0 && (
+              <View style={projDetailSt.section}>
+                <Text style={projDetailSt.sectionTitle}>
+                  ✅ Impact & résultats
+                </Text>
+                {project.highlights.map((h) => (
+                  <View key={h} style={projDetailSt.bulletRow}>
+                    <View
+                      style={[
+                        projDetailSt.bulletDot,
+                        { backgroundColor: "#10b981" },
+                      ]}
+                    />
+                    <Text style={projDetailSt.bulletText}>{h}</Text>
+                  </View>
+                ))}
               </View>
             )}
-            <View style={{ height: Spacing.four }} />
-          </ScrollView>
-        </View>
+
+            {/* ── Features ── */}
+            {project.features && project.features.length > 0 && (
+              <View style={projDetailSt.section}>
+                <Text style={projDetailSt.sectionTitle}>
+                  🚀 Fonctionnalités développées
+                </Text>
+                {project.features.map((f) => (
+                  <View key={f} style={projDetailSt.bulletRow}>
+                    <View
+                      style={[
+                        projDetailSt.bulletDot,
+                        { backgroundColor: accentSafe },
+                      ]}
+                    />
+                    <Text style={projDetailSt.bulletText}>{f}</Text>
+                  </View>
+                ))}
+              </View>
+            )}
+
+            {/* ── Back-office ── */}
+            {project.backOffice && (
+              <View style={projDetailSt.section}>
+                <Text style={projDetailSt.sectionTitle}>
+                  🖥️ Back-office web
+                </Text>
+                <View style={projDetailSt.backOfficeBox}>
+                  <Text style={projDetailSt.backOfficeText}>
+                    {project.backOffice}
+                  </Text>
+                </View>
+              </View>
+            )}
+
+            {/* ── Stack ── */}
+            <View style={projDetailSt.section}>
+              <Text style={projDetailSt.sectionTitle}>🛠️ Stack technique</Text>
+              <View style={projDetailSt.chips}>
+                {project.stack.map((t) => (
+                  <View
+                    key={t}
+                    style={[
+                      projDetailSt.chip,
+                      { borderColor: accentSafe + "55" },
+                    ]}
+                  >
+                    <Text
+                      style={[projDetailSt.chipText, { color: accentSafe }]}
+                    >
+                      {t}
+                    </Text>
+                  </View>
+                ))}
+              </View>
+            </View>
+
+            {/* ── Links ── */}
+            {hasLinks && (
+              <View style={projDetailSt.section}>
+                <Text style={projDetailSt.sectionTitle}>🔗 Liens</Text>
+                <View style={projDetailSt.linksRow}>
+                  {project.figmaUrl && (
+                    <Pressable
+                      style={({ pressed }) => [
+                        projDetailSt.linkBtn,
+                        { backgroundColor: "#7C3AED" },
+                        pressed && { opacity: 0.85 },
+                      ]}
+                      onPress={() => openLink(project.figmaUrl!)}
+                    >
+                      <Text style={projDetailSt.linkBtnText}>
+                        🎨 Figma · Design
+                      </Text>
+                    </Pressable>
+                  )}
+                  {project.demo && (
+                    <Pressable
+                      style={({ pressed }) => [
+                        projDetailSt.linkBtn,
+                        { backgroundColor: accentSafe },
+                        pressed && { opacity: 0.85 },
+                      ]}
+                      onPress={() => openLink(project.demo!)}
+                    >
+                      <Text style={projDetailSt.linkBtnText}>
+                        {project.category === "design"
+                          ? "🔗 Voir le prototype"
+                          : "🔗 Voir la démo"}
+                      </Text>
+                    </Pressable>
+                  )}
+                  {project.playStoreUrl && (
+                    <Pressable
+                      style={({ pressed }) => [
+                        projDetailSt.linkBtn,
+                        { backgroundColor: "#01875f" },
+                        pressed && { opacity: 0.85 },
+                      ]}
+                      onPress={() => openLink(project.playStoreUrl!)}
+                    >
+                      <Text style={projDetailSt.linkBtnText}>▶ Play Store</Text>
+                    </Pressable>
+                  )}
+                  {project.appStoreUrl && (
+                    <Pressable
+                      style={({ pressed }) => [
+                        projDetailSt.linkBtn,
+                        { backgroundColor: "#0a84ff" },
+                        pressed && { opacity: 0.85 },
+                      ]}
+                      onPress={() => openLink(project.appStoreUrl!)}
+                    >
+                      <Text style={projDetailSt.linkBtnText}> App Store</Text>
+                    </Pressable>
+                  )}
+                  {project.github && (
+                    <Pressable
+                      style={({ pressed }) => [
+                        projDetailSt.linkBtn,
+                        { backgroundColor: "#24292e" },
+                        pressed && { opacity: 0.85 },
+                      ]}
+                      onPress={() => openLink(project.github!)}
+                    >
+                      <Text style={projDetailSt.linkBtnText}>GitHub</Text>
+                    </Pressable>
+                  )}
+                </View>
+              </View>
+            )}
+
+            {/* ── Contact CTA ── */}
+            <Pressable
+              style={({ pressed }) => [
+                projDetailSt.ctaBtn,
+                pressed && { opacity: 0.85 },
+              ]}
+              onPress={() => openLink("https://wa.me/22959000892")}
+            >
+              <Text style={projDetailSt.ctaBtnIcon}>💬</Text>
+              <View>
+                <Text style={projDetailSt.ctaBtnTitle}>
+                  Démarrer un projet similaire
+                </Text>
+                <Text style={projDetailSt.ctaBtnSub}>
+                  Réponse garantie sous 24h · NDA disponible
+                </Text>
+              </View>
+              <Text style={projDetailSt.ctaBtnArrow}>→</Text>
+            </Pressable>
+          </View>
+        </ScrollView>
       </View>
     </Modal>
   );
@@ -707,8 +952,10 @@ export default function HomeScreen() {
 
   // ── Projects ──────────────────────────────────────────────────────────────
   const cols = isDesktop ? 3 : isMedium ? 2 : 1;
-  const projCardWidth =
-    cols === 1 ? "100%" : (`${Math.floor(100 / cols) - 1}%` as any);
+  const projPad = Spacing.four;
+  const projGap = Spacing.three;
+  const projAvail = Math.min(width, 1151) - 2 * projPad;
+  const projCardWidth = Math.floor((projAvail - (cols - 1) * projGap) / cols);
   const filtered =
     active === "all" ? projects : projects.filter((p) => p.category === active);
 
@@ -1275,28 +1522,6 @@ export default function HomeScreen() {
         </View>
 
         {/* ════════════════════════════════════════════════════════════
-            8. ILS M'ONT FAIT CONFIANCE
-        ════════════════════════════════════════════════════════════ */}
-        <View style={heroSt.clientsOuter}>
-          <View style={heroSt.clientsInner}>
-            <Text style={heroSt.clientsTitle}>Ils m'ont fait confiance</Text>
-            <View style={heroSt.clientsRow}>
-              {CLIENTS.map((c) => (
-                <View key={c.name} style={heroSt.clientCard}>
-                  <View
-                    style={[heroSt.clientLogo, { backgroundColor: c.color }]}
-                  >
-                    <Text style={heroSt.clientLogoText}>{c.abbr}</Text>
-                  </View>
-                  <Text style={heroSt.clientName}>{c.name}</Text>
-                  <Text style={heroSt.clientSub}>{c.sub}</Text>
-                </View>
-              ))}
-            </View>
-          </View>
-        </View>
-
-        {/* ════════════════════════════════════════════════════════════
             9. PROCESSUS
         ════════════════════════════════════════════════════════════ */}
         <View style={heroSt.procOuter}>
@@ -1383,7 +1608,8 @@ export default function HomeScreen() {
                 </Text>
               </Text>
               <Text style={projSt.subtitle}>
-                Découvrez une sélection de réalisations modernes et élégantes
+                Applications mobiles & design livrés en production — du MVP au
+                produit complet
               </Text>
             </View>
 
@@ -1447,7 +1673,75 @@ export default function HomeScreen() {
         <FAQAccordion />
 
         {/* ════════════════════════════════════════════════════════════
-            12. CONTACT
+            12. RÉFÉRENCES CLIENTS
+        ════════════════════════════════════════════════════════════ */}
+        <View style={trustedSt.outer}>
+          <View style={trustedSt.inner}>
+            <Text style={trustedSt.overline}>RÉFÉRENCES CLIENTS</Text>
+            <Text style={trustedSt.title}>
+              {"Ils m'ont fait "}
+              {/* @ts-ignore */}
+              <Text className="text-gradient-rn" style={trustedSt.titleAccent}>
+                confiance
+              </Text>
+            </Text>
+            <View
+              style={[trustedSt.cards, isMedium && { flexDirection: "row" }]}
+            >
+              {CLIENTS.map((c) => (
+                <View
+                  key={c.name}
+                  style={[trustedSt.card, isMedium && { flex: 1 }]}
+                >
+                  <View
+                    style={[
+                      trustedSt.logoWrap,
+                      { backgroundColor: c.color + "22" },
+                    ]}
+                  >
+                    <View
+                      style={[trustedSt.logo, { backgroundColor: c.color }]}
+                    >
+                      <Text style={trustedSt.logoText}>{c.abbr}</Text>
+                    </View>
+                  </View>
+                  <View style={trustedSt.cardBody}>
+                    <View style={trustedSt.cardHead}>
+                      <Text style={trustedSt.clientName}>{c.name}</Text>
+                      <Text style={trustedSt.clientSector}>{c.sector}</Text>
+                    </View>
+                    <View style={trustedSt.scopeRow}>
+                      <Text style={trustedSt.scopeLabel}>Rôle : </Text>
+                      <Text style={trustedSt.scopeValue}>{c.scope}</Text>
+                    </View>
+                    <View style={trustedSt.tags}>
+                      {c.projects.map((p) => (
+                        <View
+                          key={p}
+                          style={[
+                            trustedSt.tag,
+                            { borderColor: c.color + "66" },
+                          ]}
+                        >
+                          <Text style={[trustedSt.tagText, { color: c.color }]}>
+                            {p}
+                          </Text>
+                        </View>
+                      ))}
+                    </View>
+                    <View style={trustedSt.resultRow}>
+                      <Text style={trustedSt.resultIcon}>✅</Text>
+                      <Text style={trustedSt.resultText}>{c.result}</Text>
+                    </View>
+                  </View>
+                </View>
+              ))}
+            </View>
+          </View>
+        </View>
+
+        {/* ════════════════════════════════════════════════════════════
+            13. CONTACT
         ════════════════════════════════════════════════════════════ */}
         <View style={contactSt.outer} nativeID="contact">
           <View style={contactSt.inner}>
@@ -1593,7 +1887,7 @@ export default function HomeScreen() {
       </ScrollView>
 
       {selected && (
-        <ProjModal project={selected} onClose={() => setSelected(null)} />
+        <ProjDetail project={selected} onClose={() => setSelected(null)} />
       )}
       {dialog && (
         <FeedbackDialog type={dialog} onClose={() => setDialog(null)} />
@@ -1914,66 +2208,6 @@ const heroSt = StyleSheet.create({
   },
   statValue: { fontSize: 28, fontWeight: "800", letterSpacing: -0.5 },
   statLabel: { fontSize: 13, textAlign: "center", opacity: 0.75 },
-
-  clientsOuter: { backgroundColor: "#18142A", paddingVertical: 40 },
-  clientsInner: {
-    alignSelf: "center",
-    width: "100%",
-    maxWidth: 700,
-    paddingHorizontal: Spacing.four,
-    alignItems: "center",
-  },
-  clientsTitle: {
-    fontSize: 13,
-    fontWeight: "600",
-    color: "rgba(255,255,255,0.4)",
-    letterSpacing: 2,
-    textTransform: "uppercase",
-    marginBottom: Spacing.four,
-    textAlign: "center",
-  },
-  clientsRow: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "center",
-    gap: Spacing.four,
-    width: "100%",
-  },
-  clientCard: {
-    alignItems: "center",
-    gap: Spacing.one,
-    minWidth: 120,
-  },
-  clientLogo: {
-    width: 64,
-    height: 64,
-    borderRadius: 16,
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: 4,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 6,
-  },
-  clientLogoText: {
-    color: "#FFFFFF",
-    fontWeight: "800",
-    fontSize: 18,
-    letterSpacing: 1,
-  },
-  clientName: {
-    color: "#FFFFFF",
-    fontWeight: "700",
-    fontSize: 13,
-    textAlign: "center",
-  },
-  clientSub: {
-    color: "rgba(255,255,255,0.45)",
-    fontSize: 11,
-    textAlign: "center",
-  },
 
   procOuter: { backgroundColor: "#18142A", paddingVertical: 64 },
   procInner: {
@@ -2344,7 +2578,7 @@ const projSt = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     gap: Spacing.three,
-    justifyContent: "center",
+    justifyContent: "flex-start",
   },
   emptyWrap: { alignItems: "center", paddingVertical: Spacing.five },
   emptyText: {
@@ -2395,6 +2629,16 @@ const projCardSt = StyleSheet.create({
     fontWeight: "700",
     letterSpacing: 0.5,
   },
+  featuredBadge: {
+    position: "absolute",
+    bottom: 12,
+    left: 12,
+    backgroundColor: "rgba(0,0,0,0.55)",
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 20,
+  },
+  featuredText: { color: "#FBBF24", fontSize: 11, fontWeight: "700" },
   durationBadge: {
     position: "absolute",
     top: 12,
@@ -2438,112 +2682,377 @@ const projCardSt = StyleSheet.create({
     fontSize: 11,
     fontWeight: "600",
   },
+  ctaRow: {
+    borderTopWidth: 1,
+    borderTopColor: "rgba(255,255,255,0.07)",
+    paddingTop: Spacing.two,
+    marginTop: Spacing.one,
+  },
+  ctaText: {
+    color: "#6366f1",
+    fontSize: 13,
+    fontWeight: "700",
+    letterSpacing: 0.3,
+  },
 });
 
-// ── Project modal ─────────────────────────────────────────────────────────────
-const projModalSt = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.7)",
-    justifyContent: "center",
-    alignItems: "center",
-    padding: Spacing.four,
-  },
-  dialog: {
-    backgroundColor: "rgba(24,18,43,0.97)",
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: "rgba(99,102,241,0.3)",
-    width: "100%",
-    maxWidth: 700,
-    maxHeight: "90%",
-    overflow: "hidden",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 16 },
-    shadowOpacity: 0.5,
-    shadowRadius: 40,
-    elevation: 20,
-  },
+// ── Project detail (full-screen) ──────────────────────────────────────────────
+const projDetailSt = StyleSheet.create({
+  root: { flex: 1, backgroundColor: "#0F0A1E" },
   header: {
     flexDirection: "row",
-    alignItems: "flex-start",
-    padding: 20,
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: Spacing.four,
+    paddingVertical: 12,
+    backgroundColor: "#0F0A1E",
     borderBottomWidth: 1,
-    borderBottomColor: "rgba(255,255,255,0.08)",
-    gap: Spacing.three,
+    borderBottomColor: "rgba(255,255,255,0.07)",
   },
-  catBadge: {
+  backBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    paddingVertical: 6,
+    paddingRight: Spacing.two,
+  },
+  backArrow: { color: "#FFFFFF", fontSize: 20, fontWeight: "300" },
+  backLabel: {
+    color: "rgba(255,255,255,0.8)",
+    fontSize: 15,
+    fontWeight: "600",
+  },
+  catPill: {
     paddingHorizontal: 12,
-    paddingVertical: 4,
+    paddingVertical: 5,
     borderRadius: 20,
-    alignSelf: "flex-start",
-    marginBottom: 6,
   },
-  catBadgeText: {
+  catPillText: {
     color: "#fff",
     fontSize: 12,
     fontWeight: "700",
     letterSpacing: 0.5,
   },
-  title: { color: "#FFFFFF", fontWeight: "800", fontSize: 20, lineHeight: 26 },
-  closeBtn: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: "rgba(255,255,255,0.1)",
-    justifyContent: "center",
-    alignItems: "center",
-    flexShrink: 0,
+  hero: {
+    height: 300,
+    position: "relative",
+    justifyContent: "flex-end",
   },
-  closeBtnText: { color: "#fff", fontSize: 14, fontWeight: "700" },
-  body: { maxHeight: 520 },
-  imgPlaceholder: {
-    height: 200,
-    justifyContent: "center",
-    alignItems: "center",
+  heroScrim: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0,0,0,0.45)",
   },
-  imgInitials: {
-    fontSize: 72,
-    fontWeight: "900",
-    color: "rgba(255,255,255,0.2)",
-    letterSpacing: 4,
+  heroContent: {
+    padding: Spacing.four,
+    gap: 6,
   },
-  desc: {
-    color: "rgba(255,255,255,0.8)",
-    fontSize: 15,
-    lineHeight: 24,
-    padding: 20,
-  },
-  techWrap: { paddingHorizontal: 20, paddingBottom: 16 },
-  techLabel: { fontSize: 14, fontWeight: "700", marginBottom: 8 },
-  chips: { flexDirection: "row", flexWrap: "wrap", gap: 6 },
-  chip: {
-    backgroundColor: "rgba(255,255,255,0.1)",
+  featuredPill: {
+    alignSelf: "flex-start",
+    backgroundColor: "rgba(0,0,0,0.5)",
     paddingHorizontal: 10,
     paddingVertical: 4,
-    borderRadius: 8,
+    borderRadius: 20,
+    marginBottom: 4,
   },
-  chipText: { color: "rgba(255,255,255,0.8)", fontSize: 12, fontWeight: "600" },
-  links: {
+  featuredPillText: { color: "#FBBF24", fontSize: 12, fontWeight: "700" },
+  heroTitle: {
+    color: "#FFFFFF",
+    fontSize: 26,
+    fontWeight: "800",
+    lineHeight: 32,
+  },
+  heroSub: {
+    color: "rgba(255,255,255,0.8)",
+    fontSize: 14,
+    lineHeight: 20,
+  },
+  statsRow: {
     flexDirection: "row",
     flexWrap: "wrap",
     gap: Spacing.two,
-    paddingHorizontal: 20,
-    paddingBottom: 12,
+    paddingHorizontal: Spacing.four,
+    paddingVertical: Spacing.three,
+    backgroundColor: "#18122B",
+    borderBottomWidth: 1,
+    borderBottomColor: "rgba(255,255,255,0.06)",
   },
-  linkBtnGrad: {
-    backgroundColor: "#6366f1",
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 40,
+  statPill: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+    backgroundColor: "rgba(255,255,255,0.07)",
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
   },
-  linkBtnDark: {
-    backgroundColor: "#2d2d2d",
-    paddingVertical: 10,
+  statIcon: { fontSize: 13 },
+  statText: {
+    color: "rgba(255,255,255,0.85)",
+    fontSize: 13,
+    fontWeight: "600",
+  },
+  body: {
+    paddingHorizontal: Spacing.four,
+    paddingTop: Spacing.four,
+    gap: Spacing.five,
+    maxWidth: 800,
+    alignSelf: "center",
+    width: "100%",
+  },
+  section: { gap: Spacing.two },
+  sectionTitle: {
+    color: "#FFFFFF",
+    fontSize: 17,
+    fontWeight: "800",
+    marginBottom: 4,
+  },
+  challengeBox: {
+    backgroundColor: "rgba(239,68,68,0.1)",
+    borderLeftWidth: 3,
+    borderLeftColor: "#ef4444",
+    borderRadius: 8,
+    padding: Spacing.three,
+  },
+  challengeText: {
+    color: "rgba(255,255,255,0.85)",
+    fontSize: 14,
+    lineHeight: 22,
+  },
+  bulletRow: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 10,
+  },
+  bulletDot: {
+    width: 7,
+    height: 7,
+    borderRadius: 4,
+    marginTop: 7,
+    flexShrink: 0,
+  },
+  bulletText: {
+    color: "rgba(255,255,255,0.85)",
+    fontSize: 14,
+    lineHeight: 22,
+    flex: 1,
+  },
+  backOfficeBox: {
+    backgroundColor: "rgba(99,102,241,0.1)",
+    borderLeftWidth: 3,
+    borderLeftColor: "#6366f1",
+    borderRadius: 8,
+    padding: Spacing.three,
+  },
+  backOfficeText: {
+    color: "rgba(255,255,255,0.85)",
+    fontSize: 14,
+    lineHeight: 22,
+  },
+  chips: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
+  chip: {
+    borderWidth: 1,
+    paddingHorizontal: 12,
+    paddingVertical: 5,
+    borderRadius: 20,
+    backgroundColor: "rgba(255,255,255,0.04)",
+  },
+  chipText: { fontSize: 13, fontWeight: "600" },
+  linksRow: { flexDirection: "row", flexWrap: "wrap", gap: Spacing.two },
+  linkBtn: {
+    paddingVertical: 11,
     paddingHorizontal: 20,
     borderRadius: 40,
   },
   linkBtnText: { color: "#fff", fontWeight: "700", fontSize: 14 },
+  ctaBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: Spacing.three,
+    backgroundColor: "#25D366",
+    borderRadius: 16,
+    padding: Spacing.four,
+    marginTop: Spacing.two,
+  },
+  ctaBtnIcon: { fontSize: 28 },
+  ctaBtnTitle: { color: "#fff", fontSize: 16, fontWeight: "800" },
+  ctaBtnSub: { color: "rgba(255,255,255,0.8)", fontSize: 12, marginTop: 2 },
+  ctaBtnArrow: {
+    color: "#fff",
+    fontSize: 20,
+    fontWeight: "300",
+    marginLeft: "auto",
+  },
+  videoCard: {
+    height: 220,
+    position: "relative",
+    justifyContent: "center",
+    alignItems: "center",
+    overflow: "hidden",
+  },
+  videoScrim: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0,0,0,0.48)",
+  },
+  videoPlayBtn: {
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    backgroundColor: "rgba(255,255,255,0.92)",
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+  videoPlayIcon: {
+    fontSize: 26,
+    color: "#1a1a2e",
+    marginLeft: 4,
+  },
+  videoLabel: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    paddingHorizontal: Spacing.four,
+    paddingVertical: 12,
+    backgroundColor: "rgba(0,0,0,0.55)",
+  },
+  videoLabelIcon: { fontSize: 16 },
+  videoLabelText: {
+    color: "#FFFFFF",
+    fontSize: 14,
+    fontWeight: "700",
+  },
+});
+
+// ── Trusted-by (references) ───────────────────────────────────────────────────
+const trustedSt = StyleSheet.create({
+  outer: { backgroundColor: "#12102B", paddingVertical: 64 },
+  inner: {
+    alignSelf: "center",
+    width: "100%",
+    maxWidth: 1000,
+    paddingHorizontal: Spacing.four,
+  },
+  overline: {
+    color: "rgba(255,255,255,0.35)",
+    fontSize: 12,
+    fontWeight: "700",
+    letterSpacing: 3,
+    textAlign: "center",
+    marginBottom: Spacing.two,
+  },
+  title: {
+    fontSize: 34,
+    fontWeight: "800",
+    color: "#FFFFFF",
+    textAlign: "center",
+    marginBottom: Spacing.five,
+  },
+  titleAccent: { fontSize: 34, fontWeight: "800" },
+  cards: {
+    flexDirection: "column",
+    gap: Spacing.three,
+  },
+  card: {
+    backgroundColor: "#1A1530",
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.07)",
+    flexDirection: "row",
+    alignItems: "flex-start",
+    overflow: "hidden",
+  },
+  logoWrap: {
+    width: 90,
+    alignSelf: "stretch",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: Spacing.three,
+    flexShrink: 0,
+  },
+  logo: {
+    width: 56,
+    height: 56,
+    borderRadius: 14,
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.35,
+    shadowRadius: 10,
+    elevation: 6,
+  },
+  logoText: {
+    color: "#FFFFFF",
+    fontWeight: "900",
+    fontSize: 16,
+    letterSpacing: 0.5,
+  },
+  cardBody: {
+    flex: 1,
+    padding: Spacing.four,
+    gap: 10,
+  },
+  cardHead: { gap: 2 },
+  clientName: {
+    color: "#FFFFFF",
+    fontWeight: "800",
+    fontSize: 18,
+  },
+  clientSector: {
+    color: "rgba(255,255,255,0.45)",
+    fontSize: 13,
+  },
+  scopeRow: { flexDirection: "row", alignItems: "center" },
+  scopeLabel: {
+    color: "rgba(255,255,255,0.4)",
+    fontSize: 12,
+    fontWeight: "600",
+  },
+  scopeValue: {
+    color: "rgba(255,255,255,0.75)",
+    fontSize: 12,
+    fontWeight: "700",
+  },
+  tags: { flexDirection: "row", flexWrap: "wrap", gap: 6 },
+  tag: {
+    borderWidth: 1,
+    borderRadius: 20,
+    paddingHorizontal: 10,
+    paddingVertical: 3,
+    backgroundColor: "rgba(255,255,255,0.04)",
+  },
+  tagText: { fontSize: 11, fontWeight: "700" },
+  resultRow: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 6,
+    backgroundColor: "rgba(16,185,129,0.08)",
+    borderRadius: 8,
+    padding: 10,
+  },
+  resultIcon: { fontSize: 14 },
+  resultText: {
+    color: "#10b981",
+    fontSize: 13,
+    fontWeight: "700",
+    flex: 1,
+  },
 });
 
 // ── Contact ───────────────────────────────────────────────────────────────────
